@@ -70,19 +70,26 @@ def hash_table_insert(hash_table, key, value):
 def hash_table_remove(hash_table, key):
     index = hash(key, hash_table.capacity)
     current_pair = hash_table.storage[index]
-    last_pair = hash_table.storage[index]
+    prev_pair = None
 
-    if hash_table.storage[index] == None:
-       return print('Nothing there to remove')
+    if current_pair is not None:
+        while current_pair is not None and current_pair.key != key:
+            prev_pair = current_pair
+            current_pair = current_pair.next
 
-    while current_pair.key != key:
-        last_pair = current_pair
-        current_pair = current_pair.next
+        if prev_pair is None and current_pair.key == key:
+            hash_table.storage[index] = None
+            hash_table.count -= 1
+        
+        elif current_pair is None:
+            print('could not find that key')
+        else:
+            prev_pair.next = None
+    else:
+        print('could not find that key')
 
-    if current_pair.key == key:
-        last_pair.next = current_pair.next
-        hash_table.storage[index] = last_pair
-        hash_table.count -= 1
+
+ 
   
 
 
@@ -98,8 +105,9 @@ def hash_table_retrieve(hash_table, key):
     if hash_table.storage[index] == None:
        return print('There is no value at index ' + str(index))
 
-    while current_pair.key != key:
-        current_pair = current_pair.next
+    if current_pair.key != key:
+        while current_pair.key != key:
+            current_pair = current_pair.next
 
     if current_pair.key == key:
         return current_pair.value
@@ -112,7 +120,7 @@ def hash_table_retrieve(hash_table, key):
 # Fill this in
 # '''
 def hash_table_resize(hash_table):
-    new_table = HashTable(len(hash_table.storage) * 2)
+    new_table = HashTable(hash_table.capacity * 2)
     temp_array = []
 
     for pair in hash_table.storage:
@@ -121,16 +129,15 @@ def hash_table_resize(hash_table):
                 temp_array.append(pair)
             else:
                 current_pair = pair
+                temp_array.append(current_pair)
                 while current_pair.next is not None:
-                    temp_array.append(current_pair)
+                    temp_array.append(current_pair.next)
                     current_pair = current_pair.next
 
     for pair in temp_array:
         hash_table_insert(new_table, pair.key, pair.value)
 
-    hash_table = new_table
-
-    return hash_table
+    return new_table
 
 
 
@@ -155,19 +162,25 @@ def Testing():
 
 
 # Testing()
-ht = HashTable(2)
+ht = HashTable(8)
+
+hash_table_insert(ht, "key-0", "val-0")
+hash_table_insert(ht, "key-1", "val-1")
+hash_table_insert(ht, "key-2", "val-2")
+hash_table_insert(ht, "key-3", "val-3")
+hash_table_insert(ht, "key-4", "val-4")
+hash_table_insert(ht, "key-5", "val-5")
+hash_table_insert(ht, "key-6", "val-6")
+hash_table_insert(ht, "key-7", "val-7")
+hash_table_insert(ht, "key-8", "val-8")
+hash_table_insert(ht, "key-9", "val-9")
+
+
+
+ht = hash_table_resize(ht)
 print(ht)
+# print(hash_table_retrieve(ht, "key-0"))
 
-hash_table_insert(ht, "line_1", "Tiny hash table")
-hash_table_insert(ht, "line_2", "Filled beyond capacity")
-hash_table_insert(ht, "line_3", "Linked list saves the day!")
-
-
-
-hash_table_resize(ht)
-print(hash_table_retrieve(ht, "line_1"))
-print(hash_table_retrieve(ht, "line_2"))
-print(hash_table_retrieve(ht, "line_3"))
 
 
 
